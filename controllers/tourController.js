@@ -1,6 +1,7 @@
 const Tour = require('../models/tourModel');
 const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
+const AppError = require('../utils/appError');
 
 exports.aliasTopTours = async (req, res, next) => {
   req.query.limit = '5';
@@ -17,7 +18,7 @@ exports.aliasCheapTours = async (req, res, next) => {
 };
 
 //using external custom catch async function instead of try/catch
-exports.getAllTours = catchAsync(async (req, res) => {
+exports.getAllTours = catchAsync(async (req, res, next) => {
   //EXECUTE THE QUERY
   const features = new APIFeatures(Tour.find(), req.query)
     .filter()
@@ -36,8 +37,12 @@ exports.getAllTours = catchAsync(async (req, res) => {
   });
 });
 
-exports.getTour = catchAsync(async (req, res) => {
-  const tourData = await Tour.findById(req.params.id);
+exports.getTour = catchAsync(async (req, res, next) => {
+  const tourData = await Tour.findById(req.params.id, (err) => {
+    if (err) {
+      return next(new AppError('No tour found with that ID', 404));
+    }
+  });
   //could also try Tour.findOne({_id: req.params.id}) first result
   //or try Tour.find({_id: req.params.}) all results that match
 
@@ -49,7 +54,7 @@ exports.getTour = catchAsync(async (req, res) => {
   });
 });
 
-exports.addTour = catchAsync(async (req, res, next) => {
+exports.addTour = catchAsync(async (req, res) => {
   const newTour = await Tour.create(req.body);
 
   res.status(201).json({

@@ -17,4 +17,7 @@ router
 //create a user
 router.route('/signup').post(authController.signup);
 
+//log in user
+router.route('/login').post(authController.login);
+
 module.exports = router;

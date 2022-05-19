@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const bcrypt = require('bcryptjs');
 
 //name, email, photo, password, password confirm
 const userSchema = new mongoose.Schema({
@@ -22,10 +23,12 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please choose a password'],
     minlength: [8, 'Passwords must have at least 8 characters'],
+    select: false,
   },
   passwordConfirm: {
     type: String,
     required: [true, 'Please confirm your password'],
+    select: false,
     validate: {
       validator: function (el) {
         //this keyword refers to schema
@@ -35,6 +38,20 @@ const userSchema = new mongoose.Schema({
       message: 'Passwords must match',
     },
   },
+});
+
+//middleware function will run between data receive and data save to database
+userSchema.pre('save', async function (next) {
+  //this refers to current document (user)
+  if (!this.isModified('password')) return next();
+
+  //hash the password, second parameter is salt length
+  this.password = await bcrypt.hash(this.password, 12);
+
+  //deletes the password confirm from the DB, no longer needed
+  this.passwordConfirm = undefined;
+
+  next();
 });
 
 const User = mongoose.model('User', userSchema);

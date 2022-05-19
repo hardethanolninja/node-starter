@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
+const AppError = require('../utils/appError');
 
 exports.signup = catchAsync(async (req, res, next) => {
   //prevents users from including unwanted data in signup request
@@ -36,3 +37,25 @@ exports.signup = catchAsync(async (req, res, next) => {
     },
   });
 });
+
+exports.login = async (req, res, next) => {
+  const { email, password } = req.body;
+
+  //1 check if email and password exist
+  if (!email || !password) {
+    return next(new AppError('Please provide email and password', 400));
+  }
+
+  //2 check if user exists & password is valid (could be { email })
+  //"select +" explicitly selects a field that was "false" in the user model
+  const user = await User.findOne({ email: email }).select('+password');
+
+  console.log(user);
+
+  //3 if good, send token to client
+  const token = 'test token';
+  res.status(200).json({
+    status: 'success',
+    token,
+  });
+};

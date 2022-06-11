@@ -20,4 +20,8 @@ router.route('/signup').post(authController.signup);
 //log in user
 router.route('/login').post(authController.login);
 
+//forgot & reset password
+router.post('/forgot-password', authController.forgotPassword);
+router.patch('/reset-password/:token', authController.resetPassword);
+
 module.exports = router;

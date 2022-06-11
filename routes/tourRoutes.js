@@ -3,6 +3,8 @@ const tourController = require('../controllers/tourController');
 
 const router = express.Router();
 
+const authController = require('../controllers/authController');
+
 //parameter middleware (no longer needed)
 // router.param('id', tourController.checkId);
 
@@ -19,12 +21,21 @@ router
 router.route('/tour-stats').get(tourController.getTourStats);
 router.route('/monthly-plan/:year').get(tourController.getMonthlyPlan);
 
-router.route('/').get(tourController.getAllTours).post(tourController.addTour);
+router
+  .route('/')
+  .get(authController.protect, tourController.getAllTours)
+  .post(tourController.addTour);
 
 router
   .route('/:id')
   .get(tourController.getTour)
   .patch(tourController.updateTour)
-  .delete(tourController.deleteTour);
+  .delete(
+    //ensures user is logged in & valid
+    authController.protect,
+    //roles that are allowed to run this handler function
+    authController.restrictTo('admin', 'lead-guide'),
+    tourController.deleteTour
+  );
 
 module.exports = router;

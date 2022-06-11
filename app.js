@@ -12,6 +12,16 @@ if (process.env.NODE_ENV === 'development') {
 app.use(express.json());
 app.use(express.static('./public/'));
 
+//dev troubleshooting middleware
+// app.use((req, res, next) => {
+//   req.requestTime = new Date().toISOString();
+
+//   console.log('request time', req.requestTime);
+//   console.log(req.headers);
+
+//   next();
+// });
+
 //import custom routes
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');

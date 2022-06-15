@@ -1,18 +1,58 @@
 const express = require('express');
 const morgan = require('morgan');
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean');
+const hpp = require('hpp');
 
 //default convention for using express
 const app = express();
 
-//middleware for handling post request
-// console.log(process.env.NODE_ENV);
+//GLOBAL MIDDLEWARE
+//HEAD helmet sets security headers (HTTP headers)
+app.use(helmet());
+
+//HEAD toggle morgan to use only in development
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
-app.use(express.json());
-app.use(express.static('./public/'));
 
-//dev troubleshooting middleware
+//HEAD middleware body parser for parsing data from request (into req.body) and set post size limit
+app.use(express.json({ limit: '10kb' }));
+
+//HEAD middleware to sanitize data -- NoSQL query injection
+app.use(mongoSanitize());
+
+//HEAD middleware to sanitize data -- malicious HTML code
+app.use(xss());
+
+//HEAD middleware to prevent parameter pollution, object passes whitelist parameters
+app.use(
+  hpp({
+    whitelist: [
+      'duration',
+      'maxGroupSize',
+      'rate',
+      'ratingsAverage',
+      'ratingsQuantity',
+      'price',
+    ],
+  })
+);
+
+//HEAD middleware for serving static files
+app.use(express.static(`${__dirname}/public/`));
+
+//HEAD middleware to limit the number of requests (brtueforce, ddos prevention)
+const limiter = rateLimit({
+  max: 100,
+  windowMs: 60 * 60 * 1000,
+  message: 'Too many requests from this IP, please try again in an hour!',
+});
+app.use('/api', limiter);
+
+//HEAD dev troubleshooting middleware
 // app.use((req, res, next) => {
 //   req.requestTime = new Date().toISOString();
 

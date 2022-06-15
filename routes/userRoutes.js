@@ -21,7 +21,11 @@ router.patch(
   authController.updatePassword
 );
 
+//self user update
 router.patch('/update-me', authController.protect, userController.updateMe);
+//even though user is not actually deleted, it is made inactive, which is a valid use for the delete method
+//no data needs to be passed to this method
+router.delete('/delete-me', authController.protect, userController.deleteMe);
 
 //user routes
 router.route('/').get(userController.getAllUsers).post(userController.addUser);

@@ -48,9 +48,14 @@ const userSchema = new mongoose.Schema({
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetExpires: Date,
+  active: {
+    type: Boolean,
+    default: true,
+    select: false,
+  },
 });
 
-//middleware function will run between data receive and data save to database
+//HEAD middleware function will run between data receive and data save to database
 userSchema.pre('save', async function (next) {
   //"this" refers to current document (user)
   if (!this.isModified('password')) return next();
@@ -64,7 +69,7 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-//middleware to update passwordChangedAt field
+//HEAD middleware to update passwordChangedAt field
 userSchema.pre('save', function (next) {
   if (!this.isModified('password') || this.isNew) return next();
 
@@ -73,7 +78,7 @@ userSchema.pre('save', function (next) {
   next();
 });
 
-//instance method to determine if password is correct compared to hashed password
+//HEAD instance method to determine if password is correct compared to hashed password
 userSchema.methods.correctPassword = async function (
   //original password from user
   candidatePassword,
@@ -83,7 +88,7 @@ userSchema.methods.correctPassword = async function (
   return await bcrypt.compare(candidatePassword, userPassword);
 };
 
-//instance method to determine password age
+//HEAD instance method to determine password age
 userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   if (this.passwordChangedAt) {
     const changedTimestamp = parseInt(
@@ -97,7 +102,7 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   return false;
 };
 
-//create password reset token
+//HEAD create password reset token
 userSchema.methods.createPasswordResetToken = function () {
   //creats a random string of characters to be sent by email
   const resetToken = crypto.randomBytes(32).toString('hex');
@@ -116,6 +121,14 @@ userSchema.methods.createPasswordResetToken = function () {
 
   return resetToken;
 };
+
+//HEAD instance method to determine if user is active
+//pre "find" regex it query middleware (all find methods)
+userSchema.pre(/^find/, function (next) {
+  //"this" refers to the current query, will return all not "false" users, so there is flexibility for other status types in the future, or if a user is not explicitly set to active
+  this.find({ active: { $ne: false } });
+  next();
+});
 
 //must be last thing in the model
 const User = mongoose.model('User', userSchema);

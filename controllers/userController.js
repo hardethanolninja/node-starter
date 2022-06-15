@@ -24,6 +24,7 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
   });
 });
 
+//self user update
 exports.updateMe = catchAsync(async (req, res, next) => {
   //1 create error if user tries to update password
   if (req.body.password || req.body.passwordConfirm) {
@@ -48,6 +49,17 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     data: {
       user: updatedUser,
     },
+  });
+});
+
+//self user delete (make account not active)
+exports.deleteMe = catchAsync(async (req, res, next) => {
+  await User.findByIdAndUpdate(req.user.id, { active: false });
+
+  //204 code is for deleted resource
+  res.status(204).json({
+    status: 'success',
+    data: null,
   });
 });
 

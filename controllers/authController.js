@@ -21,6 +21,18 @@ const signToken = (id) =>
     }
   );
 
+const createAndSendToken = (user, statusCode, res) => {
+  const token = signToken(user._id);
+
+  res.status(statusCode).json({
+    status: 'success',
+    token,
+    data: {
+      user,
+    },
+  });
+};
+
 exports.signup = catchAsync(async (req, res, next) => {
   //prevents users from including unwanted data in signup request
   //adding photos, admin requests, etc.
@@ -32,22 +44,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     role: req.body.role,
   });
 
-  const token = signToken(newUser._id);
-
-  res.status(201).json({
-    status: 'success',
-    //here is where the token is returned
-    token,
-    data: {
-      user: {
-        //removes password from response
-        id: newUser._id,
-        name: newUser.name,
-        role: newUser.role,
-        email: newUser.email,
-      },
-    },
-  });
+  createAndSendToken(newUser, 201, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -68,12 +65,7 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   //3 if good, send token to client
-  const token = signToken(user._id);
-
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+  createAndSendToken(user, 200, res);
 });
 
 //middleware to authenticate user for protected routes
@@ -193,10 +185,29 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   await user.save();
 
   //4 log the user in, send JWT
-  const token = signToken(user._id);
+  createAndSendToken(user, 200, res);
+});
 
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  const { passwordCurrent, newPassword, passwordConfirm } = req.body;
+
+  //1. get user from collection
+  const user = await User.findById(req.user.id).select('+password');
+  if (!user) {
+    return next(new AppError('You must be logged in to change password', 401));
+  }
+
+  //2. check if POSTed current password is correct
+  if (!(await user.correctPassword(passwordCurrent, user.password))) {
+    return next(new AppError('Your current password is wrong', 401));
+  }
+
+  //3. update password to new one
+  user.password = newPassword;
+  user.passwordConfirm = passwordConfirm;
+  user.passwordChangedAt = Date.now();
+  await user.save();
+
+  //4. log user in, send JWT
+  createAndSendToken(user, 200, res);
 });

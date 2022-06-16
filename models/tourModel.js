@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const slugify = require('slugify');
 const validator = require('validator');
 
+// const User = require('./userModel'); only needed for embedding
+
 //this is a 'SCHEMA'
 const tourSchema = new mongoose.Schema(
   {
@@ -92,6 +94,40 @@ const tourSchema = new mongoose.Schema(
       //array of dates
       type: [Date],
     },
+    startLocation: {
+      //mongoDB uses "geoJSON"
+      //this object will be an embedded object, so subfields will get options
+      type: {
+        type: String,
+        default: 'Point', //type of geometry (point, geometry, etc)
+        enum: ['Point'],
+      },
+      //geoJSON will be long, lat
+      coordinates: [Number],
+      address: String,
+      description: String,
+    },
+    //use an array to specify embedded documents
+    locations: [
+      {
+        type: {
+          type: String,
+          default: 'Point',
+          enum: ['Point'],
+        },
+        coordinates: [Number],
+        address: String,
+        description: String,
+        day: Number,
+      },
+    ],
+    //referencing guides that exist, keeep data separate vs embedding
+    guides: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User',
+      },
+    ],
     secretTour: {
       type: Boolean,
       default: false,
@@ -112,7 +148,7 @@ tourSchema.virtual('durationWeeks').get(function () {
 });
 
 //mongoose middleware (pre, post)
-//NOTE document middleware
+//HEAD document middleware
 //save hook: runs before .save() and .create()
 //"this" will be the document object
 tourSchema.pre('save', function (next) {
@@ -125,7 +161,7 @@ tourSchema.pre('save', function (next) {
 //   next();
 // });
 
-//NOTE query middleware
+//HEAD query middleware
 //find hook: runs before .find() and .findOne()
 //"this" will be the query object
 tourSchema.pre(/^find/, function (next) {
@@ -136,13 +172,14 @@ tourSchema.pre(/^find/, function (next) {
   next();
 });
 
+//HEAD will run AFTER query is complete
 tourSchema.post(/^find/, function (docs, next) {
   console.log(`Query took: ${Date.now() - this.start} milliseconds`);
   // console.log(docs);
   next();
 });
 
-//NOTE aggregation middleware
+//HEAD aggregation middleware
 //"this" will be the aggregation object
 tourSchema.pre('aggregate', function (next) {
   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
@@ -150,6 +187,22 @@ tourSchema.pre('aggregate', function (next) {
   // console.log(this.pipeline());
   next();
 });
+
+//HEAD add user object to query
+tourSchema.pre(/^find/, function (next) {
+  this.populate({ path: 'guides', select: '-__v -passwordChangedAt' });
+
+  next();
+});
+
+// //HEAD middleware to get user id and add the reference to the tour (embedding the data)
+// tourSchema.pre('save', async function (next) {
+//   const guidesPromises = this.guides.map(async (id) => await User.findById(id));
+
+//   this.guides = await Promise.all(guidesPromises);
+
+//   next();
+// });
 
 //model names and variables usually are uppercase
 //this is a 'MODEL'

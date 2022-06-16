@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const Tour = require('../../models/tourModel');
 
-dotenv.config({ path: '../../config.env' });
+dotenv.config({ path: `${__dirname}./../../config.env` });
 
 const DB = process.env.DATABASE.replace(
   `<PASSWORD>`,
@@ -20,7 +20,7 @@ mongoose
 
 //read json file
 const tourData = JSON.parse(
-  fs.readFileSync(`${__dirname}/tours-simple.json`, 'utf-8')
+  fs.readFileSync(`${__dirname}/tours.json`, 'utf-8')
 );
 
 //import data into database

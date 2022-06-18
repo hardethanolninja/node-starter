@@ -120,7 +120,7 @@ exports.protect = catchAsync(async (req, res, next) => {
   next();
 });
 
-//middleware to restrict access to admin routes
+//middleware to restrict access to routes by role
 exports.restrictTo =
   (...roles) =>
   (req, res, next) => {

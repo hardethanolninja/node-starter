@@ -65,6 +65,7 @@ app.use('/api', limiter);
 //import custom routes
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
+const reviewRouter = require('./routes/reviewRoutes');
 
 //import custom error handlers
 const AppError = require('./utils/appError');
@@ -73,6 +74,7 @@ const globalErrorHandler = require('./controllers/errorController');
 //defined routes
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/reviews', reviewRouter);
 
 //middleware for undefined routes
 //put this last, because it will match everything

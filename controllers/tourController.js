@@ -43,7 +43,7 @@ exports.getTour = catchAsync(async (req, res, next) => {
     if (err && err.name !== 'CastError') {
       return next(new AppError('No tour found with that ID', 404));
     }
-  });
+  }).populate('reviews');
   //could also try Tour.findOne({_id: req.params.id}) first result
   //or try Tour.find({_id: req.params.}) all results that match
 

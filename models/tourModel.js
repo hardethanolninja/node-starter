@@ -147,6 +147,13 @@ tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
 });
 
+//virtual populate reviews
+tourSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'parentTour',
+  localField: '_id',
+});
+
 //mongoose middleware (pre, post)
 //HEAD document middleware
 //save hook: runs before .save() and .create()

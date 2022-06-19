@@ -2,7 +2,8 @@ const express = require('express');
 const reviewController = require('../controllers/reviewController');
 const authController = require('../controllers/authController');
 
-const router = express.Router();
+//options allows access to :tourId from other router
+const router = express.Router({ mergeParams: true });
 
 router
   .route('/')

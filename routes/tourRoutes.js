@@ -1,12 +1,16 @@
 const express = require('express');
+
 const tourController = require('../controllers/tourController');
+const reviewRouter = require('./reviewRoutes');
+const authController = require('../controllers/authController');
 
 const router = express.Router();
 
-const authController = require('../controllers/authController');
-
 //parameter middleware (no longer needed)
 // router.param('id', tourController.checkId);
+
+//send reviews to review router, despite them starting with "tours"
+router.use('/:tourId/reviews', reviewRouter);
 
 //aliasing
 router

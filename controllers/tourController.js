@@ -1,7 +1,13 @@
 const Tour = require('../models/tourModel');
-const APIFeatures = require('../utils/apiFeatures');
-const catchAsync = require('../utils/catchAsync');
-const AppError = require('../utils/appError');
+const factory = require('./handlerFactory');
+
+exports.getAllTours = factory.getAll(Tour);
+exports.getTour = factory.getOne(Tour, {
+  path: 'reviews',
+});
+exports.addTour = factory.createOne(Tour);
+exports.updateTour = factory.updateOne(Tour);
+exports.deleteTour = factory.deleteOne(Tour);
 
 exports.aliasTopTours = async (req, res, next) => {
   req.query.limit = '5';
@@ -16,78 +22,6 @@ exports.aliasCheapTours = async (req, res, next) => {
   req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
   next();
 };
-
-//using external custom catch async function instead of try/catch
-exports.getAllTours = catchAsync(async (req, res, next) => {
-  //EXECUTE THE QUERY
-  const features = new APIFeatures(Tour.find(), req.query)
-    .filter()
-    .sort()
-    .limitFields()
-    .paginate();
-  const tourData = await features.query;
-
-  //SEND RESPONSE
-  res.status(200).json({
-    status: 'success',
-    results: tourData.length,
-    data: {
-      tours: tourData,
-    },
-  });
-});
-
-exports.getTour = catchAsync(async (req, res, next) => {
-  const tourData = await Tour.findById(req.params.id, (err) => {
-    //lets casterrors pass to errorcontroller
-    if (err && err.name !== 'CastError') {
-      return next(new AppError('No tour found with that ID', 404));
-    }
-  }).populate('reviews');
-  //could also try Tour.findOne({_id: req.params.id}) first result
-  //or try Tour.find({_id: req.params.}) all results that match
-
-  res.status(200).json({
-    status: 'success',
-    data: {
-      tour: tourData,
-    },
-  });
-});
-
-exports.addTour = catchAsync(async (req, res) => {
-  const newTour = await Tour.create(req.body);
-
-  res.status(201).json({
-    status: 'success',
-    data: {
-      tour: newTour,
-    },
-  });
-});
-
-exports.updateTour = catchAsync(async (req, res) => {
-  const updatedTour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-  });
-
-  res.status(201).json({
-    status: 'success',
-    data: {
-      tour: updatedTour,
-    },
-  });
-});
-
-exports.deleteTour = catchAsync(async (req, res) => {
-  await Tour.findByIdAndDelete(req.params.id);
-
-  res.status(204).json({
-    status: 'success',
-    data: null,
-  });
-});
 
 //aggregation
 //using default try/catch blocks instead of custom async function

@@ -1,7 +1,20 @@
 const Review = require('../models/reviewModel');
-// const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
-// const AppError = require('../utils/appError');
+const factory = require('./handlerFactory');
+
+exports.setTourAndUserIds = (req, res, next) => {
+  //get tourId from URL
+  if (!req.body.parentTour) req.body.parentTour = req.params.tourId;
+  //get user from protect middleware
+  if (!req.body.parentUser) req.body.parentUser = req.user.id;
+
+  next();
+};
+
+exports.getReview = factory.getOne(Review);
+exports.addReview = factory.createOne(Review);
+exports.deleteReview = factory.deleteOne(Review);
+exports.updateReview = factory.updateOne(Review);
 
 exports.getAllReviews = catchAsync(async (req, res, next) => {
   let filter;
@@ -13,23 +26,7 @@ exports.getAllReviews = catchAsync(async (req, res, next) => {
     status: 'success',
     results: reviewData.length,
     data: {
-      reviews: reviewData,
-    },
-  });
-});
-
-exports.addReview = catchAsync(async (req, res) => {
-  //get tourId from URL
-  if (!req.body.parentTour) req.body.parentTour = req.params.tourId;
-  //get user from protect middleware
-  if (!req.body.parentUser) req.body.parentUser = req.user.id;
-
-  const newReview = await Review.create(req.body);
-
-  res.status(201).json({
-    status: 'success',
-    data: {
-      review: newReview,
+      data: reviewData,
     },
   });
 });

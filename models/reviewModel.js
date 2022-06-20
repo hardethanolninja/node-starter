@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const reviewSchema = new mongoose.Schema(
   {
-    reviewText: {
+    review: {
       type: String,
       required: [true, 'Review cannot be empty'],
       maxlength: [500, 'Reviews must be less than 500 characters'],
@@ -14,12 +14,12 @@ const reviewSchema = new mongoose.Schema(
       min: [1, 'The lowest rating you can leave is 1'],
       max: [5, 'The highest rating you can leave is 5'],
     },
-    parentTour: {
+    tour: {
       type: mongoose.Schema.ObjectId,
       ref: 'Tour',
       required: [true, 'Review must belong to a tour'],
     },
-    parentUser: {
+    user: {
       type: mongoose.Schema.ObjectId,
       ref: 'User',
       required: [true, 'Review must belong to user'],

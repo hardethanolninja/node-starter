@@ -43,9 +43,10 @@ const tourSchema = new mongoose.Schema(
     },
     ratingsAverage: {
       type: Number,
-      default: 4.5,
+      default: 5,
       min: [1, 'Rating must be at least 1'],
       max: [5, 'Rating must be at most 5'],
+      set: (val) => Math.round(val * 10) / 10,
     },
     ratingsQuantity: {
       type: Number,
@@ -140,6 +141,14 @@ const tourSchema = new mongoose.Schema(
   }
 );
 
+//NOTE adding indexes
+// "1" ascending, "-1" is decending
+// tourSchema.index({ price: 1 });
+tourSchema.index({ price: 1, ratingsAverage: -1 }); //compound index
+tourSchema.index({ slug: 1 });
+//for geospacial data, needs to be 2d sphere index
+tourSchema.index({ startLocation: '2dsphere' });
+
 //must be regular function to access "this" keyword
 //virtual properties are not in database, will be accessable when you "get" data
 //virtual properties cannot be used in queries (not in database)
@@ -188,12 +197,12 @@ tourSchema.post(/^find/, function (docs, next) {
 
 //HEAD aggregation middleware
 //"this" will be the aggregation object
-tourSchema.pre('aggregate', function (next) {
-  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
-  //to see the aggregation pipeline, must call the pipeline function
-  // console.log(this.pipeline());
-  next();
-});
+// tourSchema.pre('aggregate', function (next) {
+//   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+//   //to see the aggregation pipeline, must call the pipeline function
+//   // console.log(this.pipeline());
+//   next();
+// });
 
 //HEAD add user object to query
 tourSchema.pre(/^find/, function (next) {

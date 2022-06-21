@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Tour = require('./tourModel');
 
 const reviewSchema = new mongoose.Schema(
   {
@@ -32,12 +33,71 @@ const reviewSchema = new mongoose.Schema(
   }
 );
 
+//prevent multiple reviews on same tour by single user
+reviewSchema.index({ tour: 1, user: 1 }, { unique: true });
+
 //HEAD add tour & user object to query
 reviewSchema.pre(/^find/, function (next) {
   //   this.populate({ path: 'parentTour', select: 'name' });
   this.populate({ path: 'parentUser', select: 'name photo' });
 
   next();
+});
+
+//NOTE static method on schema
+reviewSchema.statics.calcAvgRatings = async function (tourId) {
+  //this keyword will point to current model
+  const stats = await this.aggregate([
+    {
+      $match: { tour: tourId },
+    },
+    {
+      $group: {
+        _id: '$tour',
+        numRating: {
+          //for each document, "1" will be added
+          $sum: 1,
+        },
+        avgRating: {
+          //pick field to average
+          $avg: '$rating',
+        },
+      },
+    },
+  ]);
+
+  // console.log('stats:', stats);
+  if (stats.length > 0) {
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingsQuantity: stats[0].numRating,
+      ratingsAverage: stats[0].avgRating,
+    });
+  } else {
+    await Tour.findByIdAndUpdate(tourId, {
+      //default stats
+      ratingsQuantity: 0,
+      ratingsAverage: 5,
+    });
+  }
+};
+
+reviewSchema.post('save', function () {
+  //first "this" points to the model, second "this" points to the tour being saved
+  this.constructor.calcAvgRatings(this.tour);
+});
+
+//NOTE no access to document middleware in query, workaround
+//findByIdAndUpdate
+//findByIdAndDelete
+reviewSchema.pre(/^findOneAnd/, async function (next) {
+  //finds doc in database, BEFORE save
+  //create property on "this" variable, passes from "pre" middleware to "post" middleware
+  this.r = await this.findOne();
+  next();
+});
+reviewSchema.post(/^findOneAnd/, async function () {
+  //query has already exectured at this point, so can't call findOne()
+  await this.r.constructor.calcAvgRatings(this.r.tour);
 });
 
 const Review = mongoose.model('Review', reviewSchema);

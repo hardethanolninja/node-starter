@@ -4,9 +4,9 @@ const factory = require('./handlerFactory');
 
 exports.setTourAndUserIds = (req, res, next) => {
   //get tourId from URL
-  if (!req.body.parentTour) req.body.parentTour = req.params.tourId;
+  if (!req.body.tour) req.body.tour = req.params.tourId;
   //get user from protect middleware
-  if (!req.body.parentUser) req.body.parentUser = req.user.id;
+  if (!req.body.user) req.body.user = req.user.id;
 
   next();
 };

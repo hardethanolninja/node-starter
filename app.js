@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
@@ -9,7 +10,14 @@ const hpp = require('hpp');
 //default convention for using express
 const app = express();
 
+//declare template engine
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'));
+
 //GLOBAL MIDDLEWARE
+//HEAD middleware for serving static files (css, js, images)
+app.use(express.static(path.join(__dirname, 'public')));
+
 //HEAD helmet sets security headers (HTTP headers)
 app.use(helmet());
 
@@ -41,9 +49,6 @@ app.use(
   })
 );
 
-//HEAD middleware for serving static files
-app.use(express.static(`${__dirname}/public/`));
-
 //HEAD middleware to limit the number of requests (brtueforce, ddos prevention)
 const limiter = rateLimit({
   max: 100,
@@ -71,7 +76,15 @@ const reviewRouter = require('./routes/reviewRoutes');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 
-//defined routes
+//view routes
+app.get('/', (req, res) => {
+  res.status(200).render('base', {
+    tour: 'The Forest Hiker',
+    user: 'John Doe',
+  });
+});
+
+//defined API routes
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);

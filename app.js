@@ -71,18 +71,14 @@ app.use('/api', limiter);
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
+const viewRouter = require('./routes/viewRoutes');
 
 //import custom error handlers
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 
-//view routes
-app.get('/', (req, res) => {
-  res.status(200).render('base', {
-    tour: 'The Forest Hiker',
-    user: 'John Doe',
-  });
-});
+//View routes
+app.use('/', viewRouter);
 
 //defined API routes
 app.use('/api/v1/tours', tourRouter);

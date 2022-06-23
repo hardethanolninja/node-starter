@@ -1,41 +1,16 @@
 doctype html 
 html
   head
-    meta( charset='UTF-8')
-    meta( name='viewport' content='width=device-width, initial-scale=1.0')
-    link( href='https://fonts.googleapis.com/css?family=Lato:300,300i,700' rel='stylesheet')
-    link(rel='stylesheet' href="css/style.css")
-    link(rel='shortcut icon' type='image/png' href='img/favicon.png')
-    title Natours | Exciting tours for adventurous people
-    
-    body
-        // header
-        header.header
-            nav.nav.nav--tours
-                a.nav__el(href='#') All Tours
-            .header__logo
-                img(src='img/logo-white.png' alt="Natours logo")
-            nav.nav.nav--user
-                a.nav__el(href='#') My Bookings
-                a.nav__el(href="#")
-                    img.nav__user-img(src='img/user.jpg' alt="User photo") 
-                    span John Doe             
-                button.nav__el.nav__el--cta Log In   
-                button.nav__el.nav__el--cta Sign up    
+    include components/_head
 
-        //content
-        section.overview 
-            h1= tour
+  body
+    // header
+    include components/_header
 
-        //footer
-        footer.footer
-            .footer__logo
-                img(src='img/logo-green.png' alt="Natours logo")
-            ul.footer__nav
-                li: a(href='#') About Us
-                li: a(href='#') Download Apps
-                li: a(href='#') Become a Guide
-                li: a(href='#') Careers
-                li: a(href='#') Contact
-            p.footer__copywright &copy; Jonas Schmedtmann. All rights reserved
+    //content
+    block content 
+      h1 This is a placeholder title
+
+    //footer
+    include components/_footer
 

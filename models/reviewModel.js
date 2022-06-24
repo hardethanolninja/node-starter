@@ -39,7 +39,7 @@ reviewSchema.index({ tour: 1, user: 1 }, { unique: true });
 //HEAD add tour & user object to query
 reviewSchema.pre(/^find/, function (next) {
   //   this.populate({ path: 'parentTour', select: 'name' });
-  this.populate({ path: 'parentUser', select: 'name photo' });
+  this.populate({ path: 'user', select: 'name photo' });
 
   next();
 });

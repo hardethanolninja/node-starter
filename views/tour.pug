@@ -1,5 +1,13 @@
 extends base
 
+block append head
+  script(src='/js/leaflet.js' defer)
+  link(rel='stylesheet' href='https://unpkg.com/leaflet@1.8.0/dist/leaflet.css'
+    integrity='sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ==' crossorigin='')
+  script(src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"
+    integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="
+    crossorigin="")
+
 mixin overviewBox(label, text, icon)
   .overview-box__detail
     svg.overview-box__icon
@@ -52,7 +60,7 @@ block content
       -const paragraphs = tour.description.split('\n')
       each paragraph in paragraphs
         p.description__text #{paragraph}
-      
+
 
   section.section-pictures
     each image, ind in tour.images
@@ -60,7 +68,8 @@ block content
         img.picture-box__img(src=`/img/tours/${image}`, alt=`${tour.name} ${ind + 1}`, class=`picture-box__img--${ind + 1}`)
 
   section.section-map
-    #map
+    #map(data-locations=`${JSON.stringify(tour.locations)}`)
+    #tourId(data-tourId=`${JSON.stringify(tour._id)}`)
 
   section.section-reviews
     .reviews

@@ -1322,3 +1322,26 @@ body {
   -webkit-transform: translateY(-2px);
   transform: translateY(-2px);
 }
+
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
+}
+
+.map-popup {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.leaflet-popup-content {
+  color: rgb(79, 195, 124);
+}

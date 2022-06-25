@@ -933,6 +933,7 @@ body {
   outline: none;
 }
 .nav__el--cta {
+  margin: 0px 4px;
   padding: 1rem 3rem;
   border-radius: 10rem;
   border: 1px solid currentColor !important;

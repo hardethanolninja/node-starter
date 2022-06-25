@@ -6,6 +6,7 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
+const cookieParser = require('cookie-parser');
 
 //default convention for using express
 const app = express();
@@ -41,8 +42,8 @@ const connectSrcUrls = [
   'https://unpkg.com',
   'https://tile.openstreetmap.org',
   'https://*.cloudflare.com',
-  'http://localhost:8000/api/v1/users/login',
-  'http://localhost/api/v1/bookings/checkout-session/',
+  'http://localhost:3000/api/v1/users/login',
+  'http://localhost:3000/api/v1/bookings/checkout-session/',
 ];
 
 const fontSrcUrls = ['fonts.googleapis.com', 'fonts.gstatic.com'];
@@ -68,6 +69,8 @@ if (process.env.NODE_ENV === 'development') {
 
 //HEAD middleware body parser for parsing data from request (into req.body) and set post size limit
 app.use(express.json({ limit: '10kb' }));
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+app.use(cookieParser());
 
 //HEAD middleware to sanitize data -- NoSQL query injection
 app.use(mongoSanitize());

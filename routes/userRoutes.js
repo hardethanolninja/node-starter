@@ -7,7 +7,7 @@ const router = express.Router();
 //create a user
 router.route('/signup').post(authController.signup);
 
-//log/out in user
+//log in user
 router.route('/login').post(authController.login);
 
 //log out user
@@ -23,7 +23,13 @@ router.use(authController.protect);
 router.patch('/update-password', authController.updatePassword);
 
 //self user update
-router.patch('/update-me', userController.updateMe);
+//upload.single is field in form that will be uploaded, will put file info on request object
+router.patch(
+  '/update-me',
+  userController.uploadPhoto,
+  userController.resizePhoto,
+  userController.updateMe
+);
 
 //even though user is not actually deleted, it is made inactive, which is a valid use for the delete method
 //no data needs to be passed to this method

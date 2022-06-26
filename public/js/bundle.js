@@ -11328,6 +11328,9 @@ var updateSettings = /*#__PURE__*/function () {
 
             if (res.data.status === 'success') {
               (0, _alerts.showAlert)('success', "User ".concat(type === 'userData' ? 'data' : 'password', " updated"));
+              setTimeout(function () {
+                location.reload();
+              }, 1500);
             }
 
             _context.next = 11;
@@ -11665,12 +11668,12 @@ if (logoutButton) {
 if (dataForm) {
   dataForm.addEventListener('submit', function (e) {
     e.preventDefault();
-    var name = document.querySelector('#name').value;
-    var email = document.querySelector('#email').value;
-    (0, _updateSettings.updateSettings)({
-      name: name,
-      email: email
-    }, 'userData');
+    var form = new FormData();
+    form.append('name', document.querySelector('#name').value);
+    form.append('email', document.querySelector('#email').value);
+    form.append('photo', document.querySelector('#photo').files[0]);
+    console.log(form);
+    (0, _updateSettings.updateSettings)(form, 'userData');
   });
 }
 

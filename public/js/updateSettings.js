@@ -21,6 +21,9 @@ export const updateSettings = async (data, type) => {
         'success',
         `User ${type === 'userData' ? 'data' : 'password'} updated`
       );
+      setTimeout(() => {
+        location.reload();
+      }, 1500);
     }
   } catch (err) {
     showAlert('error', err.response.data.message);

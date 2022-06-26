@@ -1,7 +1,76 @@
+const multer = require('multer');
+const sharp = require('sharp');
+
 const Tour = require('../models/tourModel');
 const AppError = require('../utils/appError');
 const factory = require('./handlerFactory');
 const catchAsync = require('../utils/catchAsync');
+
+//for temp saving to memory before manipulating file (buffer)
+const multerStorage = multer.memoryStorage();
+
+// upload.single('image') req.file
+// upload.array('images', 5) req.files
+// upload.fields([{option1: 'option1'}]) req.files
+
+const multerFilter = (req, file, callback) => {
+  if (file.mimetype.startsWith('image')) {
+    callback(null, true);
+  } else {
+    callback(
+      new AppError('Not a valid file type, please upload only images', 400),
+      false
+    );
+  }
+};
+
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter,
+});
+
+exports.uploadTourImages = upload.fields([
+  { name: 'imageCover', maxCount: 1 },
+  { name: 'images', maxCount: 3 },
+]);
+
+exports.resizeTourImages = catchAsync(async (req, res, next) => {
+  if (!req.files.imageCover || !req.files.images) return next();
+
+  //process cover image
+  //make dynamic file name
+  //because we're using a factory function, need to add file name to req.body
+  req.body.imageCover = `tour-${req.params.id}-${Date.now()}-cover.jpeg`;
+
+  //file is kept in memory before editing (buffer)
+  await sharp(req.files.imageCover[0].buffer)
+    //3 x 2 ratio
+    .resize(2000, 1333)
+    .toFormat('jpeg')
+    .jpeg({ quality: 90 })
+    .toFile(`public/img/tours/${req.body.imageCover}`);
+
+  //process other images (array)
+  req.body.images = [];
+
+  //need to put async outside forEach loop, because it will not actually be async otherwise, using MAP instead with promise.all
+  await Promise.all(
+    req.files.images.map(async (file, ind) => {
+      const fileName = `tour-${req.params.id}-${Date.now()}-${ind + 1}.jpeg`;
+
+      await sharp(file.buffer)
+        //3 x 2 ratio
+        .resize(2000, 1333)
+        .toFormat('jpeg')
+        .jpeg({ quality: 90 })
+        .toFile(`public/img/tours/${fileName}`);
+
+      req.body.images.push(fileName);
+    })
+  );
+
+  next();
+});
 
 exports.getAllTours = factory.getAll(Tour);
 exports.getTour = factory.getOne(Tour, {

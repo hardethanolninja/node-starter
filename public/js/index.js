@@ -1,15 +1,18 @@
 /* eslint-disable */
+
 import '@babel/polyfill';
 import { displayMap } from './leaflet';
 import { login, logout } from './login';
 import { updateSettings } from './updateSettings';
 import { showAlert } from './alerts';
+import { bookTour } from './stripe';
 
 const mapBox = document.getElementById('map');
 const loginForm = document.querySelector('.form--login');
 const logoutButton = document.querySelector('.nav__el--logout');
 const dataForm = document.querySelector('.form-user-data');
 const passForm = document.querySelector('.form-user-password');
+const bookBtn = document.querySelector('#book-tour');
 
 if (mapBox) {
   // ----------------------------------------------
@@ -65,5 +68,14 @@ if (passForm) {
     document.querySelector('#password').value = '';
     document.querySelector('#password-confirm').value = '';
     document.querySelector('.btn--update-pw').textContent = 'Save Password';
+  });
+}
+
+if (bookBtn) {
+  bookBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.target.textContent = 'Processing...';
+    const tourId = e.target.dataset.tourid;
+    bookTour(tourId);
   });
 }

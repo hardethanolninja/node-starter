@@ -45,7 +45,7 @@ if (dataForm) {
     form.append('name', document.querySelector('#name').value);
     form.append('email', document.querySelector('#email').value);
     form.append('photo', document.querySelector('#photo').files[0]);
-    console.log(form);
+    // console.log(form);
 
     updateSettings(form, 'userData');
   });

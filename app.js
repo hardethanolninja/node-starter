@@ -7,6 +7,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
 const cookieParser = require('cookie-parser');
+const compression = require('compression');
 
 //default convention for using express
 const app = express();
@@ -109,6 +110,8 @@ app.use('/api', limiter);
 
 //   next();
 // });
+
+app.use(compression());
 
 //import custom routes
 const tourRouter = require('./routes/tourRoutes');

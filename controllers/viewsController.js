@@ -41,6 +41,12 @@ exports.getAccount = (req, res) => {
   });
 };
 
+exports.signUp = (req, res) => {
+  res.status(200).render('signup', {
+    title: 'Sign up for a Natours Account',
+  });
+};
+
 exports.getMyTours = catchAsync(async (req, res, next) => {
   //1 find all bookings
   const bookings = await Booking.find({ user: req.user.id });

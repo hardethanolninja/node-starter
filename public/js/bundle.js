@@ -11200,7 +11200,7 @@ var login = /*#__PURE__*/function () {
             _context.next = 3;
             return (0, _axios.default)({
               method: 'POST',
-              url: 'http://localhost:3000/api/v1/users/login',
+              url: '/api/v1/users/login',
               data: {
                 email: email,
                 password: password
@@ -11251,7 +11251,7 @@ var logout = /*#__PURE__*/function () {
             _context2.next = 3;
             return (0, _axios.default)({
               method: 'GET',
-              url: 'http://localhost:3000/api/v1/users/logout'
+              url: '/api/v1/users/logout'
             });
 
           case 3:
@@ -11314,7 +11314,7 @@ var updateSettings = /*#__PURE__*/function () {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
-            url = type === 'userData' ? 'http://localhost:3000/api/v1/users/update-me' : 'http://localhost:3000/api/v1/users/update-password';
+            url = type === 'userData' ? '/api/v1/users/update-me' : '/api/v1/users/update-password';
             _context.prev = 1;
             _context.next = 4;
             return (0, _axios.default)({
@@ -11387,7 +11387,7 @@ var bookTour = /*#__PURE__*/function () {
             stripe = Stripe('pk_test_51LG8VODVyWSOBs6IGLfSBQJ3sTpiKXvdCtajmDFS0kRHwjmPztoRGcj3I7fBNguHHaqn3zMeXanckh0GMgOWEPS100P8WooiVA');
             _context.prev = 1;
             _context.next = 4;
-            return (0, _axios.default)("http://localhost:3000/api/v1/bookings/checkout-session/".concat(tourId));
+            return (0, _axios.default)("/api/v1/bookings/checkout-session/".concat(tourId));
 
           case 4:
             session = _context.sent;
@@ -11714,9 +11714,7 @@ var passForm = document.querySelector('.form-user-password');
 var bookBtn = document.querySelector('#book-tour');
 
 if (mapBox) {
-  // ----------------------------------------------
   // Get locations from HTML
-  // ----------------------------------------------
   var locations = JSON.parse(document.getElementById('map').dataset.locations);
   (0, _leaflet.displayMap)(locations);
 }

@@ -6,8 +6,8 @@ import { showAlert } from './alerts';
 export const updateSettings = async (data, type) => {
   const url =
     type === 'userData'
-      ? 'http://localhost:3000/api/v1/users/update-me'
-      : 'http://localhost:3000/api/v1/users/update-password';
+      ? '/api/v1/users/update-me'
+      : '/api/v1/users/update-password';
 
   try {
     const res = await axios({

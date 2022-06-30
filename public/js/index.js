@@ -15,9 +15,7 @@ const passForm = document.querySelector('.form-user-password');
 const bookBtn = document.querySelector('#book-tour');
 
 if (mapBox) {
-  // ----------------------------------------------
   // Get locations from HTML
-  // ----------------------------------------------
   const locations = JSON.parse(
     document.getElementById('map').dataset.locations
   );

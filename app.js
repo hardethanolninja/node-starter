@@ -60,8 +60,8 @@ const connectSrcUrls = [
   'https://unpkg.com',
   'https://tile.openstreetmap.org',
   'https://*.cloudflare.com',
-  'http://localhost:3000/api/v1/users/login',
-  'http://localhost:3000/api/v1/bookings/checkout-session/',
+  'https://lienhard-node-proj.herokuapp.com/api/v1/users/login',
+  'https://lienhard-node-proj.herokuapp.com/api/v1/bookings/checkout-session/',
 ];
 
 const fontSrcUrls = ['fonts.googleapis.com', 'fonts.gstatic.com'];

@@ -4,13 +4,8 @@ const router = express.Router();
 
 const viewsController = require('../controllers/viewsController');
 const authController = require('../controllers/authController');
-const bookingController = require('../controllers/bookingController');
+// const bookingController = require('../controllers/bookingController');
 
-router.get('/', authController.isLoggedIn, viewsController.getOverview);
-router.get('/tour/:slug', authController.isLoggedIn, viewsController.getTour);
-router.get('/login', authController.isLoggedIn, viewsController.getLogin);
-router.get('/sign-up', viewsController.signUp);
-router.get('/me', authController.protect, viewsController.getAccount);
 router.get(
   '/my-tours',
   authController.protect,
@@ -18,6 +13,12 @@ router.get(
   // bookingController.createBookingCheckout,
   viewsController.getMyTours
 );
+
+router.get('/', authController.isLoggedIn, viewsController.getOverview);
+router.get('/tour/:slug', authController.isLoggedIn, viewsController.getTour);
+router.get('/login', authController.isLoggedIn, viewsController.getLogin);
+router.get('/sign-up', viewsController.signUp);
+router.get('/me', authController.protect, viewsController.getAccount);
 
 router.post(
   '/submit-user-data',

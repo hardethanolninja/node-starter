@@ -7,7 +7,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
 const cookieParser = require('cookie-parser');
-const compression = require('compression');
+const cors = require('cors');
 
 //default convention for using express
 const app = express();
@@ -19,6 +19,23 @@ app.set('views', path.join(__dirname, 'views'));
 //GLOBAL MIDDLEWARE
 //HEAD middleware for serving static files (css, js, images)
 app.use(express.static(path.join(__dirname, 'public')));
+
+//HEAD implement CORS
+//access-control-allow-origin header added to *
+//only for "simple requests" (GET, POST)
+//not for PATCH, PUT, DELETE, or req with cookies or nonstandard headers; those require "preflight phase"
+app.use(cors());
+//NOTE for specific urls
+// app.use(
+//   cors({
+//     origin: 'https://urlIWantToUse.com',
+//   })
+// );
+
+//HEAD to fix complex requests, use this http method (preflight phase)
+app.options('*', cors());
+//NOTE for specific urls
+// app.options('/api/v1/tours/:id', cors())
 
 //HEAD helmet sets security headers (HTTP headers)
 // Further HELMET configuration for Content Security Policy (CSP)
@@ -68,6 +85,15 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
+const bookingController = require('./controllers/bookingController');
+//this route is top level so that the request will not be converted to json
+//HEAD stripe webook
+app.post(
+  '/webhook-checkout',
+  express.raw({ type: 'application/json' }),
+  bookingController.webhookCheckout
+);
+
 //HEAD middleware body parser for parsing data from request (into req.body) and set post size limit
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
@@ -110,8 +136,6 @@ app.use('/api', limiter);
 
 //   next();
 // });
-
-app.use(compression());
 
 //import custom routes
 const tourRouter = require('./routes/tourRoutes');
